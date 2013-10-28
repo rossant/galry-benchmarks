@@ -27,7 +27,7 @@ def run_galry(data):
 # -----------------------------------------------------------------------------
 # Main function
 # -----------------------------------------------------------------------------
-def run_firstframe(lib, N, seed=20130318):
+def run_firstframe(lib, N, seed=20130318, dt=None, duration=None):
     
     fun = globals()['run_' + lib]
     

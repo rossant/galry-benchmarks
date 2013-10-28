@@ -2,6 +2,7 @@
 # Imports
 # -----------------------------------------------------------------------------
 import sys, os, random, time
+from time import sleep
 from qtools.qtpy.QtCore import *
 from qtools.qtpy.QtGui import *
 
@@ -55,6 +56,8 @@ class AppForm(QMainWindow):
             
             # print the delay
             sys.stdout.write(str(delay) + '\r')
+        else:
+            self.close()
             
         # close the window after TOTAL_FRAMES frames
         if time.clock() >= self.t00 + self.duration:
@@ -84,7 +87,7 @@ def run_matplotlib(N, dt=1, duration=10, seed=20130318):
     """Return the median time interval between two successive paint refresh."""
     prng = RandomState(seed)
     window = show_window(AppForm, N=N, seed=seed, dt=dt, duration=duration)
-    return np.median(window.times)
+    return 1. / np.median(window.times)
 
     
 # -----------------------------------------------------------------------------
@@ -109,6 +112,8 @@ def callback(self, (t,)):
         
         # print the delay
         sys.stdout.write(str(delay) + '\r')
+    else:
+        self.widget.close_widget()
     
 def run_galry(N, dt=1, duration=10, seed=20130318):
     """Return the median time interval between two successive paint refresh."""
@@ -123,7 +128,7 @@ def run_galry(N, dt=1, duration=10, seed=20130318):
     fig.animate(callback, dt=dt * .001)
     fig.show()
     
-    return np.median(fig.times)
+    return 1. / np.median(fig.times)
     
 def run_fps(lib, *args, **kwargs):
     return globals()['run_' + lib](*args, **kwargs)
