@@ -1,9 +1,16 @@
+# -----------------------------------------------------------------------------
+# Imports
+# -----------------------------------------------------------------------------
 import subprocess
 
 import numpy as np
 from numpy.random import RandomState
 from memory_profiler import memory_usage
 
+
+# -----------------------------------------------------------------------------
+# Main function
+# -----------------------------------------------------------------------------
 def run(lib, N, dt=1, duration=10, seed=20130318):
     return float(subprocess.check_output(['python', 'memory_tool.py',
                                     str(lib), str(N), 
