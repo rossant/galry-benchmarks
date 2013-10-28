@@ -80,7 +80,7 @@ class AppForm(QMainWindow):
         self.setCentralWidget(self.main_frame)
         self.show()
 
-def fps_mpl(N, dt=1, duration=10, seed=20130318):
+def run_matplotlib(N, dt=1, duration=10, seed=20130318):
     """Return the median time interval between two successive paint refresh."""
     prng = RandomState(seed)
     window = show_window(AppForm, N=N, seed=seed, dt=dt, duration=duration)
@@ -110,7 +110,7 @@ def callback(self, (t,)):
         # print the delay
         sys.stdout.write(str(delay) + '\r')
     
-def fps_gl(N, dt=1, duration=10, seed=20130318):
+def run_galry(N, dt=1, duration=10, seed=20130318):
     """Return the median time interval between two successive paint refresh."""
     prng = RandomState(seed)
     data = prng.randn(N, 10)        
@@ -126,8 +126,8 @@ def fps_gl(N, dt=1, duration=10, seed=20130318):
     return np.median(fig.times)
     
 if __name__ == "__main__":
-    print fps_gl(1e4)
-    print fps_mpl(1e4)
+    print run_galry(1e4)
+    print run_matplotlib(1e4)
     
     
     
