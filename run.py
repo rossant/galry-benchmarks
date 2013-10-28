@@ -134,9 +134,6 @@ def run_all(machine_name):
                     
 if __name__ == '__main__':
     
-    # HACK: ensure that matplotlibrc is not used for benchmarks
-    os.chdir('benchmarks')
-    
     
     # Get the filename with the results in JSON: 
     # first command-line argument, or machine name.
