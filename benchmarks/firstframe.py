@@ -27,7 +27,7 @@ def run_galry(data):
 # -----------------------------------------------------------------------------
 # Main function
 # -----------------------------------------------------------------------------
-def run(lib, N, seed=20130318):
+def run_firstframe(lib, N, seed=20130318):
     
     fun = globals()['run_' + lib]
     
@@ -53,5 +53,5 @@ def run(lib, N, seed=20130318):
 if __name__ == "__main__":
     for lib in ('matplotlib', 'galry'):
         print("First frame rendering time {lib}: {time:.3f} s".format(lib=lib, 
-                time=run(lib, 1e5)))
+                time=run_firstframe(lib, 1e4)))
 

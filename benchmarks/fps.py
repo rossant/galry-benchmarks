@@ -125,10 +125,10 @@ def run_galry(N, dt=1, duration=10, seed=20130318):
     
     return np.median(fig.times)
     
-def run(lib, *args, **kwargs):
+def run_fps(lib, *args, **kwargs):
     return globals()['run_' + lib](*args, **kwargs)
     
 if __name__ == "__main__":
     for lib in ('matplotlib', 'galry'):
-        print "FPS {lib}: {fps:.1f} FPS".format(lib=lib, fps=1./run(lib, 1e4))
+        print "FPS {lib}: {fps:.1f} FPS".format(lib=lib, fps=1./run_fps(lib, 1e4))
 
