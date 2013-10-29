@@ -12,7 +12,7 @@ from memory_profiler import memory_usage
 # Main function
 # -----------------------------------------------------------------------------
 def run_memory(lib, N, dt=1, duration=10, seed=20130318):
-    return float(subprocess.check_output(['python', 'memory_tool.py',
+    return float(subprocess.check_output(['python', 'benchmarks/memory_tool.py',
                                     str(lib), str(N), 
                                     '--duration='+str(duration),
                                     '--dt='+str(dt),

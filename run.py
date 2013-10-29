@@ -5,28 +5,42 @@ import socket
 import datetime
 import time
 import argparse
+import multiprocessing
+import platform
 
 import numpy as np
 import galry
+import matplotlib
+import OpenGL
 
 from benchmarks import run_firstframe, run_memory, run_fps
 
-def run_all(machine_name):
+def run_all(machine_name, maxlogsize=5):
     
-    seeds = [20130318, 20131028, 123456789]
+    seeds = [20130318,]# 20131028, 123456789]
     
     r = {
         'machine_name': machine_name,
+        'machine_info': {
+            'ncpus': multiprocessing.cpu_count(),
+            'system': platform.system(),
+            'platform': platform.platform(),
+            'machine': platform.machine(),
+            'processor': platform.processor(),
+        },
         'seeds': seeds,
         'date': datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'),
         'versions': {
+            'python': platform.python_version(),
             'matplotlib': matplotlib.__version__,
             'galry': galry.__version__,
+            'numpy': np.__version__,
+            'pyopengl': OpenGL.__version__,
         }
     }
-    # TODO: further machine characteristics
     
-    sizes = 10 ** np.arange(1, 6 + 1)
+    
+    sizes = 10 ** np.arange(1, maxlogsize + 1)
     r['benchmarks'] = {
         name : {lib: {
                         N: [globals()['run_' + name](lib, N, 
