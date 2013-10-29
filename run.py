@@ -4,6 +4,7 @@ import json
 import socket
 import datetime
 import time
+import argparse
 
 import numpy as np
 import galry
@@ -12,17 +13,23 @@ import matplotlib.pyplot as plt
 
 from benchmarks import run_firstframe, run_memory, run_fps
 
-def plot_values(x, y, xlabel='', ylabel='', title='', xticks=[], yticks=[]):
+def plot_values(x, y, yerr, xlabel='', ylabel='', title='', 
+                xticks=[], yticks=[],
+                ax=None):
 
     # discard empty values
     ind_mpl = y[:,1] > 0
 
     # plot y consumption
     # plt.axes(mplparams.aps['axes'])
-    plt.semilogx(x, y[:,0], '-ok', label='Galry')
-    plt.semilogx(x[ind_mpl], y[ind_mpl, 1], '--xk', label='Matplotlib')
+    plt.errorbar(x, y[:,0], fmt='-ok', yerr=yerr[:,0], 
+                 label='Galry')
+    plt.errorbar(x[ind_mpl], y[ind_mpl, 1], fmt='--xk', yerr=yerr[ind_mpl,1], 
+                 label='Matplotlib')
     plt.xticks(xticks)
     plt.yticks(yticks)
+    
+    ax.set_xscale("log", nonposx='clip')
     plt.grid()
 
     # legends
@@ -30,19 +37,28 @@ def plot_values(x, y, xlabel='', ylabel='', title='', xticks=[], yticks=[]):
     plt.ylabel(ylabel, fontsize='x-large')
     plt.title(title, fontsize='x-large')
 
-def get_fps(r):
-    # TODO
-    return sizes, fps
+def get_lib_values(rr):
+    """rr is a dict {size: [val1, val2..]}."""
+    keys = sorted([int(x) for x in rr.keys()])
+    return np.vstack([rr[str(key)] for key in keys])
     
-def get_firstframe(r):
-    # TODO
-    return sizes, time
+def get_values(r, name):
+    keys = sorted([int(x) for x in r['benchmarks'][name]['galry'].keys()])
+    sizes = 10 * np.array(keys)
+    galry = get_lib_values(r['benchmarks'][name]['galry'])
+    matplotlib = get_lib_values(r['benchmarks'][name]['matplotlib'])
     
-def get_memory(r):
-    # TODO
-    return sizes, memory
+    m = np.empty((len(sizes), 2))
+    m[:,0] = galry.mean(axis=1)
+    m[:,1] = matplotlib.mean(axis=1)
     
-def plot_all(dir=''):
+    s = np.empty((len(sizes), 2))
+    s[:,0] = galry.std(axis=1)
+    s[:,1] = matplotlib.std(axis=1)
+    
+    return sizes, m, s
+    
+def plot_all(r):
     import mplparams
     plt.rcParams.update(mplparams.aps['params'])
 
@@ -50,51 +66,35 @@ def plot_all(dir=''):
     xticks = [1e2, 1e4, 1e6, 1e8]
     xlabel = "Number of points"
     
-    # First frame
-    # -----------
-    plt.subplot(131)
-    
-    sizes, times = get_firstframe(r)
-    # d = np.load(os.path.join(dir, 'firstframe.npz'))
-    # sizes = d['sizes'] * 10  # 10 plots on each figure
-    # times = d['times'] * .001
-
-    plot_values(sizes, times, xlabel=xlabel, ylabel='First frame rendering time (s)',
-            title='First frame rendering time', xticks=xticks, yticks=[0, 5, 10, 15, 20])
+    # First frame.
+    ax = plt.subplot(131)
+    sizes, times, yerr = get_values(r, 'firstframe')
+    plot_values(sizes, times, yerr, xlabel=xlabel, ylabel='First frame rendering time (s)',
+                title='First frame rendering time', 
+                xticks=xticks, yticks=[0, 5, 10, 15, 20],
+                ax=ax)
     plt.ylim(0, 23)
-    # plt.legend(loc=2)
-    plt.legend(loc=2, numpoints=1, fontsize='x-large')#bbox_to_anchor=(0, 0, 1, 1), 
-        # bbox_transform=plt.gcf().transFigure, borderaxespad=0)
+    plt.legend(loc=2, numpoints=1, fontsize='x-large')
 
-    # Memory
-    # ------
-    plt.subplot(132)
-
-    sizes, memory = get_memory(r)
-    # d = np.load(os.path.join(dir, 'memory.npz'))
-    # sizes = d['sizes'] * 10  # 10 plots on each figure
-    # memory = d['memory']
-
-    plot_values(sizes, memory, xlabel=xlabel, ylabel='Memory (MB)',
-            title='Memory consumption', xticks=xticks, yticks=[0, 500, 1000, 1500, 2000])
+    # Memory.
+    ax = plt.subplot(132)
+    sizes, memory, yerr = get_values(r, 'memory')
+    plot_values(sizes, memory, yerr, xlabel=xlabel, ylabel='Memory (MB)',
+                title='Memory consumption', 
+                xticks=xticks, yticks=[0, 500, 1000, 1500, 2000],
+                ax=ax)
     plt.ylim(0, 2200)
     
-
-    # FPS
-    # ---
-    plt.subplot(133)
-
-    # TODO
-    sizes, fps = get_fps(r)
-    # sizes = d['sizes'] * 10  # 10 plots on each figure
-    # times = 1. / d['times']
-
-    plot_values(sizes, fps, xlabel=xlabel, ylabel='Frames per second',
-            title='Frames per second', xticks=xticks, yticks=[0, 100, 200, 300, 400, 500])
-    plt.ylim(0, 520)
+    # FPS.
+    ax = plt.subplot(133)
+    sizes, fps, yerr = get_values(r, 'fps')
+    plot_values(sizes, fps, yerr, xlabel=xlabel, ylabel='Frames per second',
+                title='Frames per second', 
+                xticks=xticks, yticks=range(0, 1001, 200),
+                ax=ax)
+    plt.ylim(0, 1000)
     
-    plt.savefig(os.path.join(dir, 'benchmarks.pdf'))
-    
+    plt.savefig(r['machine_name'] + '.pdf')
     plt.show()
 
 def run_all(machine_name):
@@ -134,24 +134,22 @@ def run_all(machine_name):
                     
 if __name__ == '__main__':
     
+    parser = argparse.ArgumentParser()
+    parser.add_argument('machine_name', nargs='?')
+    parser.add_argument('--force', action='store_true')
+    args = parser.parse_args()
     
     # Get the filename with the results in JSON: 
     # first command-line argument, or machine name.
-    if len(sys.argv) <= 1:
-        machine_name = socket.gethostname()
-    else:
-        machine_name = sys.argv[1]
+    machine_name = args.machine_name or socket.gethostname()
     machine_name = ''.join(c for c in machine_name.lower()
         if c.isalnum() or c in ('_', '-')).rstrip()
     path = machine_name + '.json'
     
-    
-    
-    # DEBUG
-    if os.path.exists(path):
+    # Force the execution of the tests.
+    force = args.force
+    if force and os.path.exists(path):
         os.remove(path)
-    
-    
     
     # Launch or load benchmarks from JSON file.
     if os.path.exists(path):
@@ -165,7 +163,7 @@ if __name__ == '__main__':
             json.dump(r, f, indent=4)
     
     # Plot results.
-    # plot_all(r)
     print json.dumps(r, indent=4)
+    plot_all(r)
     
     

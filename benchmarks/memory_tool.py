@@ -16,11 +16,11 @@ def benchmark(function, N, dt=1, duration=10, seed=20130318):
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("type")
-    parser.add_argument("N")
-    parser.add_argument("--seed")
-    parser.add_argument("--duration", help='in seconds')
-    parser.add_argument("--dt", help='in ms')
+    parser.add_argument('type')
+    parser.add_argument('N')
+    parser.add_argument('--seed')
+    parser.add_argument('--duration', help='in seconds')
+    parser.add_argument('--dt', help='in ms')
     
     args = parser.parse_args()
     type = args.type
