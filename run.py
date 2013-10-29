@@ -26,7 +26,7 @@ def run_all(machine_name):
     }
     # TODO: further machine characteristics
     
-    sizes = 10 ** np.arange(1, 3 + 1)
+    sizes = 10 ** np.arange(1, 6 + 1)
     r['benchmarks'] = {
         name : {lib: {
                         N: [globals()['run_' + name](lib, N, 

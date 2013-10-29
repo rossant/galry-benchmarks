@@ -11,30 +11,6 @@ import galry
 import matplotlib
 import matplotlib.pyplot as plt
 
-def plot_values(x, y, yerr, xlabel='', ylabel='', title='', 
-                xticks=[], yticks=[],
-                ax=None):
-
-    # discard empty values
-    ind_mpl = y[:,1] > 0
-
-    # plot y consumption
-    # plt.axes(mplparams.aps['axes'])
-    plt.errorbar(x, y[:,0], fmt='-ok', yerr=yerr[:,0], 
-                 label='Galry')
-    plt.errorbar(x[ind_mpl], y[ind_mpl, 1], fmt='--xk', yerr=yerr[ind_mpl,1], 
-                 label='Matplotlib')
-    plt.xticks(xticks)
-    plt.yticks(yticks)
-    
-    ax.set_xscale("log", nonposx='clip')
-    plt.grid()
-
-    # legends
-    plt.xlabel(xlabel, fontsize='x-large')
-    plt.ylabel(ylabel, fontsize='x-large')
-    plt.title(title, fontsize='x-large')
-
 def get_lib_values(rr):
     """rr is a dict {size: [val1, val2..]}."""
     keys = sorted([int(x) for x in rr.keys()])
@@ -56,6 +32,28 @@ def get_values(r, name):
     
     return sizes, m, s
     
+def plot_values(x, y, yerr, xlabel='', ylabel='', title='', 
+                xticks=[], yticks=[]):
+
+    # discard empty values
+    ind_mpl = y[:,1] > 0
+
+    # plot y consumption
+    # plt.axes(mplparams.aps['axes'])
+    plt.errorbar(x, y[:,0], fmt='-ok', yerr=yerr[:,0], 
+                 label='Galry')
+    plt.errorbar(x[ind_mpl], y[ind_mpl, 1], fmt='--xk', yerr=yerr[ind_mpl,1], 
+                 label='Matplotlib')
+    plt.xticks(xticks)
+    plt.yticks(yticks)
+    
+    plt.grid()
+
+    # legends
+    plt.xlabel(xlabel, fontsize='x-large')
+    plt.ylabel(ylabel, fontsize='x-large')
+    plt.title(title, fontsize='x-large')
+
 def plot_all(r):
     import mplparams
     plt.rcParams.update(mplparams.aps['params'])
@@ -66,30 +64,30 @@ def plot_all(r):
     
     # First frame.
     ax = plt.subplot(131)
+    ax.set_xscale("log", nonposx='clip')
     sizes, times, yerr = get_values(r, 'firstframe')
     plot_values(sizes, times, yerr, xlabel=xlabel, ylabel='First frame rendering time (s)',
                 title='First frame rendering time', 
-                xticks=xticks, yticks=[0, 5, 10, 15, 20],
-                ax=ax)
+                xticks=xticks, yticks=[0, 5, 10, 15, 20])
     plt.ylim(0, 23)
     plt.legend(loc=2, numpoints=1, fontsize='x-large')
 
     # Memory.
     ax = plt.subplot(132)
+    ax.set_xscale("log", nonposx='clip')
     sizes, memory, yerr = get_values(r, 'memory')
     plot_values(sizes, memory, yerr, xlabel=xlabel, ylabel='Memory (MB)',
                 title='Memory consumption', 
-                xticks=xticks, yticks=[0, 500, 1000, 1500, 2000],
-                ax=ax)
+                xticks=xticks, yticks=[0, 500, 1000, 1500, 2000])
     plt.ylim(0, 2200)
     
     # FPS.
     ax = plt.subplot(133)
+    ax.set_xscale("log", nonposx='clip')
     sizes, fps, yerr = get_values(r, 'fps')
     plot_values(sizes, fps, yerr, xlabel=xlabel, ylabel='Frames per second',
                 title='Frames per second', 
-                xticks=xticks, yticks=range(0, 1001, 200),
-                ax=ax)
+                xticks=xticks, yticks=range(0, 1001, 200))
     plt.ylim(0, 1000)
     
     plt.savefig(r['machine_name'] + '.pdf')
