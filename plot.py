@@ -33,19 +33,20 @@ def get_values(r, name):
     return sizes, m, s
     
 def plot_values(x, y, yerr, xlabel='', ylabel='', title='', 
-                xticks=[], yticks=[]):
+                xticks=None, yticks=None):
 
     # discard empty values
     ind_mpl = y[:,1] > 0
 
     # plot y consumption
-    # plt.axes(mplparams.aps['axes'])
     plt.errorbar(x, y[:,0], fmt='-ok', yerr=yerr[:,0], 
                  label='Galry')
     plt.errorbar(x[ind_mpl], y[ind_mpl, 1], fmt='--xk', yerr=yerr[ind_mpl,1], 
                  label='Matplotlib')
-    plt.xticks(xticks)
-    plt.yticks(yticks)
+    if xticks is not None:
+        plt.xticks(xticks)
+    if yticks is not None:
+        plt.yticks(yticks)
     
     plt.grid()
 
@@ -54,11 +55,12 @@ def plot_values(x, y, yerr, xlabel='', ylabel='', title='',
     plt.ylabel(ylabel, fontsize='x-large')
     plt.title(title, fontsize='x-large')
 
-def plot_all(r):
+def plot_all(r, filename):
     import mplparams
     plt.rcParams.update(mplparams.aps['params'])
 
     plt.figure(figsize=(14, 4))
+    plt.locator_params(axis='y', nbins=4)
     xlabel = "Number of points"
     
     # First frame.
@@ -68,7 +70,7 @@ def plot_all(r):
     xticks = 10 ** np.arange(2, np.log10(sizes.max()) + 1, 2)
     plot_values(sizes, times, yerr, xlabel=xlabel, ylabel='First frame rendering time (s)',
                 title='First frame rendering time', 
-                xticks=xticks, yticks=np.arange(0, times.max() + 1))
+                xticks=xticks,)# yticks=np.arange(0, times.max() + 1))
     plt.ylim(0, times.max()*1.1)
     plt.legend(loc=2, numpoints=1, fontsize='x-large')
 
@@ -78,7 +80,7 @@ def plot_all(r):
     sizes, memory, yerr = get_values(r, 'memory')
     plot_values(sizes, memory, yerr, xlabel=xlabel, ylabel='Memory (MB)',
                 title='Memory consumption', 
-                xticks=xticks, yticks=np.arange(0, memory.max()+10, 10))
+                xticks=xticks,)#yticks=np.arange(0, memory.max()+10, 10))
     plt.ylim(0, memory.max()*1.1)
     
     # FPS.
@@ -87,24 +89,18 @@ def plot_all(r):
     sizes, fps, yerr = get_values(r, 'fps')
     plot_values(sizes, fps, yerr, xlabel=xlabel, ylabel='Frames per second',
                 title='Frames per second', 
-                xticks=xticks, yticks=range(0, 1001, 200))
+                xticks=xticks,)#yticks=range(0, 1001, 200))
     plt.ylim(0, fps.max()*1.1)
     
-    plt.savefig(r['machine_name'] + '.pdf')
+    plt.savefig(os.path.splitext(filename)[0] + '.pdf')
     plt.show()
 
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser()
-    parser.add_argument('machine_name', nargs='?')
+    parser.add_argument('filename')
     args = parser.parse_args()
-    
-    # Get the filename with the results in JSON: 
-    # first command-line argument, or machine name.
-    machine_name = args.machine_name or socket.gethostname()
-    machine_name = ''.join(c for c in machine_name.lower()
-        if c.isalnum() or c in ('_', '-')).rstrip()
-    path = machine_name + '.json'
+    path = args.filename
     
     # Load benchmarks from JSON file.
     print("Loading benchmarks from '{0:s}'...".format(path))
@@ -113,6 +109,6 @@ if __name__ == '__main__':
     
     # Plot results.
     print(json.dumps(r, indent=4))
-    plot_all(r)
+    plot_all(r, path)
     
     
