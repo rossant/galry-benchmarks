@@ -59,17 +59,17 @@ def plot_all(r):
     plt.rcParams.update(mplparams.aps['params'])
 
     plt.figure(figsize=(14, 4))
-    xticks = [1e2, 1e4, 1e6, 1e8]
     xlabel = "Number of points"
     
     # First frame.
     ax = plt.subplot(131)
     ax.set_xscale("log", nonposx='clip')
     sizes, times, yerr = get_values(r, 'firstframe')
+    xticks = 10 ** np.arange(2, np.log10(sizes.max()) + 1, 2)
     plot_values(sizes, times, yerr, xlabel=xlabel, ylabel='First frame rendering time (s)',
                 title='First frame rendering time', 
-                xticks=xticks, yticks=[0, 5, 10, 15, 20])
-    plt.ylim(0, 23)
+                xticks=xticks, yticks=np.arange(0, times.max() + 1))
+    plt.ylim(0, times.max()*1.1)
     plt.legend(loc=2, numpoints=1, fontsize='x-large')
 
     # Memory.
@@ -78,8 +78,8 @@ def plot_all(r):
     sizes, memory, yerr = get_values(r, 'memory')
     plot_values(sizes, memory, yerr, xlabel=xlabel, ylabel='Memory (MB)',
                 title='Memory consumption', 
-                xticks=xticks, yticks=[0, 500, 1000, 1500, 2000])
-    plt.ylim(0, 2200)
+                xticks=xticks, yticks=np.arange(0, memory.max()+10, 10))
+    plt.ylim(0, memory.max()*1.1)
     
     # FPS.
     ax = plt.subplot(133)
@@ -88,7 +88,7 @@ def plot_all(r):
     plot_values(sizes, fps, yerr, xlabel=xlabel, ylabel='Frames per second',
                 title='Frames per second', 
                 xticks=xticks, yticks=range(0, 1001, 200))
-    plt.ylim(0, 1000)
+    plt.ylim(0, fps.max()*1.1)
     
     plt.savefig(r['machine_name'] + '.pdf')
     plt.show()
