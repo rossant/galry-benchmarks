@@ -17,7 +17,7 @@ from benchmarks import run_firstframe, run_memory, run_fps
 
 def run_all(machine_name, maxlogsize=5):
     
-    seeds = [20130318, 20131028, 20131029]
+    seeds = [20130318,]
     
     r = {
         'machine_name': machine_name,
