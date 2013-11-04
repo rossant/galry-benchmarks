@@ -64,7 +64,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('machine_name', nargs='?')
     parser.add_argument('--force', action='store_true')
+    parser.add_argument('--maxlogsize')
     args = parser.parse_args()
+    maxlogsize = int(args.maxlogsize or 5)
     
     # Get the filename with the results in JSON: 
     # first command-line argument, or machine name.
@@ -85,7 +87,7 @@ if __name__ == '__main__':
             r = json.load(f)
     else:
         print("Launching benchmarks...")
-        r = run_all(machine_name)
+        r = run_all(machine_name, maxlogsize=maxlogsize)
         with open(path, 'w') as f:
             json.dump(r, f, indent=4)
     

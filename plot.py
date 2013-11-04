@@ -102,9 +102,13 @@ def plot_all(r, filename):
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser()
-    parser.add_argument('filename')
+    parser.add_argument('filename', nargs='?')
     args = parser.parse_args()
     path = args.filename
+    if not path:
+        files = [_ for _ in os.listdir('.') if _.endswith('.json')]
+        assert files, "Please specify the path to a JSON file."
+        path = files[0]
     
     # Load benchmarks from JSON file.
     print("Loading benchmarks from '{0:s}'...".format(path))
