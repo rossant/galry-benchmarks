@@ -10,7 +10,8 @@ These values are computed on plots containing 10 white noise signals with (N/10)
 
 To run the benchmarks:
 
-  * You need Matplotlib and the latest version of Galry (>0.2.0dev)
+  * You need Matplotlib and the latest version of Galry (>= 0.2.0)
+  
   * Clone this repository, cd into it, and run:
     
         python run.py
