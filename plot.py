@@ -21,14 +21,18 @@ def get_values(r, name):
     sizes = 10 * np.array(keys)
     galry = get_lib_values(r['benchmarks'][name]['galry'])
     matplotlib = get_lib_values(r['benchmarks'][name]['matplotlib'])
+    ng = galry.shape[0]
+    nm = matplotlib.shape[0]
     
     m = np.empty((len(sizes), 2))
-    m[:,0] = galry.mean(axis=1)
-    m[:,1] = matplotlib.mean(axis=1)
+    m[:,0] = np.mean(galry, axis=1)
+    m[:nm,1] = np.mean(matplotlib, axis=1)
+    m[nm:,1] = np.nan
     
     s = np.empty((len(sizes), 2))
-    s[:,0] = galry.std(axis=1)
-    s[:,1] = matplotlib.std(axis=1)
+    s[:,0] = np.std(galry, axis=1)
+    s[:nm,1] = np.std(matplotlib, axis=1)
+    s[nm:,1] = np.nan
     
     return sizes, m, s
     
@@ -36,8 +40,8 @@ def plot_values(x, y, yerr, xlabel='', ylabel='', title='',
                 xticks=None, yticks=None):
 
     # discard empty values
-    ind_mpl = y[:,1] > 0
-
+    ind_mpl = ~np.isnan(y[:,1])
+    
     # plot y consumption
     plt.errorbar(x, y[:,0], fmt='-ok', yerr=yerr[:,0], 
                  label='Galry')
@@ -71,7 +75,7 @@ def plot_all(r, filename):
     plot_values(sizes, times, yerr, xlabel=xlabel, ylabel='First frame rendering time (s)',
                 title='First frame rendering time', 
                 xticks=xticks,)# yticks=np.arange(0, times.max() + 1))
-    plt.ylim(0, times.max()*1.1)
+    plt.ylim(0, times[~np.isnan(times)].max()*1.1)
     plt.legend(loc=2, numpoints=1, fontsize='x-large')
 
     # Memory.
@@ -81,7 +85,7 @@ def plot_all(r, filename):
     plot_values(sizes, memory, yerr, xlabel=xlabel, ylabel='Memory (MB)',
                 title='Memory consumption', 
                 xticks=xticks,)#yticks=np.arange(0, memory.max()+10, 10))
-    plt.ylim(0, memory.max()*1.1)
+    plt.ylim(0, memory[~np.isnan(memory)].max()*1.1)
     
     # FPS.
     ax = plt.subplot(133)
@@ -90,7 +94,7 @@ def plot_all(r, filename):
     plot_values(sizes, fps, yerr, xlabel=xlabel, ylabel='Frames per second',
                 title='Frames per second', 
                 xticks=xticks,)#yticks=range(0, 1001, 200))
-    plt.ylim(0, fps.max()*1.1)
+    plt.ylim(0, fps[~np.isnan(fps)].max()*1.1)
     
     plt.savefig(os.path.splitext(filename)[0] + '.pdf')
     plt.show()
@@ -108,7 +112,7 @@ if __name__ == '__main__':
         r = json.load(f)
     
     # Plot results.
-    print(json.dumps(r, indent=4))
+    # print(json.dumps(r, indent=4))
     plot_all(r, path)
     
     
