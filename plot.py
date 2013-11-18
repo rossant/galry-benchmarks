@@ -70,6 +70,7 @@ def plot_all(r, filename):
     # First frame.
     ax = plt.subplot(131)
     ax.set_xscale("log", nonposx='clip')
+    # ax.set_yscale("log", nonposy='clip')
     sizes, times, yerr = get_values(r, 'firstframe')
     xticks = 10 ** np.arange(2, np.log10(sizes.max()) + 1, 2)
     plot_values(sizes, times, yerr, xlabel=xlabel, ylabel='First frame rendering time (s)',
@@ -81,6 +82,7 @@ def plot_all(r, filename):
     # Memory.
     ax = plt.subplot(132)
     ax.set_xscale("log", nonposx='clip')
+    # ax.set_yscale("log", nonposy='clip')
     sizes, memory, yerr = get_values(r, 'memory')
     plot_values(sizes, memory, yerr, xlabel=xlabel, ylabel='Memory (MB)',
                 title='Memory consumption', 
@@ -90,6 +92,7 @@ def plot_all(r, filename):
     # FPS.
     ax = plt.subplot(133)
     ax.set_xscale("log", nonposx='clip')
+    # ax.set_yscale("log", nonposy='clip')
     sizes, fps, yerr = get_values(r, 'fps')
     plot_values(sizes, fps, yerr, xlabel=xlabel, ylabel='Frames per second',
                 title='Frames per second', 
