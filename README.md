@@ -22,3 +22,7 @@ To run the benchmarks:
         
     to plot the results.
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/rossant/galry-benchmarks/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
